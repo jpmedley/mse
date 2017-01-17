@@ -24,34 +24,35 @@
     if (window.MediaSource) {
       var mediaSource = new MediaSource();
       vidElement.src = URL.createObjectURL(mediaSource);
+      // TODO: Make version that tries if (readyState != closed) {}
       mediaSource.addEventListener('sourceopen', sourceOpen);
     } else {
       console.log("The Media Source Extensions API is not supported.")
     }
 
     function sourceOpen(e) {
-      var video = 'droid.webm';
       var mime = 'video/webm; codecs="opus, vp9"';
-      //this keyword referrs to mediaSource
-      var sourceBuffer = this.addSourceBuffer(mime);
+      var mediaSource = this;
+      var sourceBuffer = mediaSource.addSourceBuffer(mime);
+      var video = 'droid.webm';
       fetch(video).then(function(response) {
         var reader = response.body.getReader();
-        reader.read().then(function processResult(result) {
+        function processResult(result) {
           if (result.done) {
+            mediaSource.endOfStream();
             return;
           }
-          sourceBuffer.onupdateend = function() {
-            reader.read().then(processResult);
-          }
           sourceBuffer.appendBuffer(result.value);
-        })
+        }
+
+        sourceBuffer.onupdateend = function() {
+          reader.read().then(processResult);
+        }
+
+        reader.read().then(processResult);
+
       });
     }
-
-
- 
-
-
   </script>
 
 </body>
