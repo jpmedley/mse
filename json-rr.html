@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<!-- Media streaming example
+  Reads an .mpd file created using mp4box and plays the file
+-->     
+<head>
+  <meta charset="utf-8" />
+  <title>Media streaming example</title>
+  <style>
+    video {
+      max-width: 100%;
+    }
+  </style>
+</head>
+
+<body>     
+  <h1>Simple MSE Streaming player</h1>
+  <video autoplay controls></video>
+
+  <script>
+
+
+    var vidElement = document.querySelector('video');
+
+    var vidData = (function() {
+      return fetch('droid-range.json')
+        .then(function(response) {
+          return response.json()
+            .then(function(jsn) {
+              return jsn.video[0];
+            });
+        });
+    })();
+
+    window.MediaSource = window.MediaSource || window.WebKitMediaSource;
+    if (window.MediaSource) {
+      var mediaSource = new MediaSource();
+      vidElement.src = URL.createObjectURL(mediaSource);
+      // TODO: Make version that tries if (readyState != closed) {}
+      mediaSource.addEventListener('sourceopen', sourceOpen);
+    } else {
+      console.log("The Media Source Extensions API is not supported.")
+    }
+
+    function sourceOpen(e) {
+      var mime = 'video/webm; codecs="opus, vp9"';
+      var mediaSource = this;
+      var sourceBuffer = mediaSource.addSourceBuffer(mime);
+      vidData.then(function(data){
+        fetchRangeReader(data.stream, data.initRange)
+          .then(function(reader) {
+            function processResult(result) {
+              if (result.done) {
+                mediaSource.endOfStream();
+                return;
+              }
+              sourceBuffer.appendBuffer(result.value);
+            }
+
+            sourceBuffer.onupdateend = function() {
+              reader.read().then(processResult);
+            }
+
+            reader.read().then(processResult);
+          })
+      })
+      
+
+    }
+
+    function fetchRangeReader(file, range) {
+      var mediaHeaders = new Headers();
+      mediaHeaders.append('Range', range);
+      var reqInit = { headers: mediaHeaders };
+      return fetch(file, reqInit)
+        .then(function(response) {
+          return response.body.getReader();
+        })
+    }
+
+    // function fetchSegment()
+
+
+  </script>
+
+  <script>
+    // var vidElement = document.querySelector('video');
+
+    // window.MediaSource = window.MediaSource || window.WebKitMediaSource;
+    // if (window.MediaSource) {
+    //   var mediaSource = new MediaSource();
+    //   vidElement.src = URL.createObjectURL(mediaSource);
+    //   // TODO: Make version that tries if (readyState != closed) {}
+    //   mediaSource.addEventListener('sourceopen', sourceOpen);
+    // } else {
+    //   console.log("The Media Source Extensions API is not supported.")
+    // }
+
+    function sourceOpen_(e) {
+      var mime = 'video/webm; codecs="opus, vp9"';
+      var mediaSource = this;
+      var sourceBuffer = mediaSource.addSourceBuffer(mime);
+      var video = 'droid.webm';
+      fetch(video).then(function(response) {
+        var reader = response.body.getReader();
+        function processResult(result) {
+          if (result.done) {
+            mediaSource.endOfStream();
+            return;
+          }
+          sourceBuffer.appendBuffer(result.value);
+        }
+
+        sourceBuffer.onupdateend = function() {
+          reader.read().then(processResult);
+        }
+
+        reader.read().then(processResult);
+
+      });
+    }
+  </script>
+
+</body>
+</html>
