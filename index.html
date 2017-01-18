@@ -34,7 +34,7 @@
       var mime = 'video/webm; codecs="opus, vp9"';
       var mediaSource = this;
       var sourceBuffer = mediaSource.addSourceBuffer(mime);
-      var video = 'droid.webm';
+      var video = 'media/droid.webm';
       fetch(video).then(function(response) {
         var reader = response.body.getReader();
         function processResult(result) {

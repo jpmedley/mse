@@ -1,7 +1,7 @@
 {
   "video": [
     { "name": "droid",
-      "stream": "droid.webm",
+      "stream": "/media/droid.webm",
       "initRange": "0-815",
       "index": [
         { "range": "816-895", "start": 0, "end": 10 }
@@ -10,7 +10,7 @@
   ],
  "audio": [
     { "name" : "'English",
-      "stream": "/video/english.mp4",
+      "stream": "/media/english.mp4",
       "initRange": "0-200",
       "index" : [
         { "range": "312-400", "start": 0, "end": 10 },
