@@ -1,0 +1,27 @@
+{
+  video: [
+    '1080p': {
+      initSegment: '/video/1080p-init.mp4',
+      index: [
+        { start: 0, end: 10, segment: '/video/1080p-segment1.mp4' },
+        { start: 10, end: 20, segment: '/video/1080p-segment2.mp4' },
+      ],
+    }
+    '480p': {
+      initSegment: '/video/480p-init.mp4',
+      index: [
+        { start: 0, end: 10, segment: '/video/1080p-segment1.mp4' },
+        { start: 10, end: 20, segment: '/video/1080p-segment2.mp4' },
+      ],
+    }
+  ],
+  audio: [
+    'English': {
+      initSegment: '/video/english-init.mp4',
+      index: [
+        { start: 0, end: 10, segment: '/video/english-segment1.mp4' },
+        { start: 10, end: 20, segment: '/video/english-segment2.mp4' },
+      ],
+    }
+  ],
+}
