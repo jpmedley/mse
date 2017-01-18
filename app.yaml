@@ -13,9 +13,12 @@ handlers:
   static_files: index.html
   upload: /index.html
 
-- url: /(.+\.*)
-  static_files: \1
-  upload: /(.+\.*)
+- url: /media/.*\.(webm|mp4)
+  script: main.app
+
+# - url: /(.+\.*)
+#   static_files: \1
+#   upload: /(.+\.*)
 
 libraries:
 - name: webapp2
