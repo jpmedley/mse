@@ -1,0 +1,14 @@
+{
+  "/index.html": {
+    "/styles.css": {
+	  	"weight": 1,
+	  	"type": "style"
+	  }
+  },
+  "/": {
+    "/styles.css": {
+	  	"weight": 1,
+	  	"type": "style"
+	  }
+  }
+}
