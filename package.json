@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/jpmedley/mse/issues"
   },
-  "homepage": "https://github.com/jpmedley/mse#readme"
+  "homepage": "https://github.com/jpmedley/mse#readme",
+  "dependencies": {
+    "whatwg-fetch": "^2.0.2"
+  }
 }

@@ -3,12 +3,20 @@
     "/styles.css": {
 	  	"weight": 1,
 	  	"type": "style"
-	  }
+	},
+	"/fetch.js": {
+		"weight": 1,
+		"type": "style"
+	}
   },
   "/": {
     "/styles.css": {
 	  	"weight": 1,
 	  	"type": "style"
-	  }
+	},
+	"/fetch.js": {
+		"weight": 1,
+		"type": "style"
+	}
   }
 }
