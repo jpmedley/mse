@@ -2,9 +2,12 @@
   "video": [
     { "name": "droid",
       "stream": "/media/droid.webm",
-      "initRange": "0-815",
+      "initRange": "0-403192",
       "index": [
-        { "range": "816-895", "start": 0, "end": 10 }
+        { "range": "403192-806384", "start": 0, "end": 10 },
+        { "range": "806385-1209577", "start": 10, "end": 20 },
+        { "range": "1209578-1612770", "start": 20, "end": 30 },
+        { "range": "1612771-2015962", "start": 30, "end": 40 }
       ]
     }
   ],

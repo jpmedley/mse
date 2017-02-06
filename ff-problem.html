@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<!-- Media streaming example
+  Reads an .mpd file created using mp4box and plays the file
+-->     
+<head>
+  <meta charset="utf-8" />
+  <title>Media streaming example</title>
+  <link href="styles.css" rel="stylesheet">
+  <script src="fetch.js" type="text/javascript"></script>
+  <style>
+    video {
+      max-width: 100%;
+    }
+  </style>
+</head>
+
+<body>     
+  <h1>Simple MSE Streaming player</h1>
+  <video autoplay controls></video>
+
+  <script>
+    var vidElement = document.querySelector('video');
+
+    window.MediaSource = window.MediaSource || window.WebKitMediaSource;
+    if (window.MediaSource) {
+      var mediaSource = new MediaSource();
+      vidElement.src = URL.createObjectURL(mediaSource);
+      mediaSource.addEventListener('sourceopen', sourceOpen);
+    } else {
+      console.log("The Media Source Extensions API is not supported.")
+    }
+
+    function sourceOpen(e) {
+
+          var ve = document.querySelector('video');
+      var mimeTypes = ['video/webm; codecs="opus, vp9"',
+                       'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'];
+      fileExtRe = /\/(\w+);/;
+      for (var t in mimeTypes) {
+        if (MediaSource.isTypeSupported(mimeTypes[t])) {
+          var mimeType = mimeTypes[t];
+          var vidExt = fileExtRe.exec(mimeType);
+          var mt = mimeType.split(';')[0]
+          console.log(ve.canPlayType(mt))
+          break;
+        }
+      }
+      var mediaSource = this;
+      var sourceBuffer = mediaSource.addSourceBuffer(mimeType);
+      var video = 'media/droid.' + vidExt[1];
+      fetch(video)
+        .then(function(response) {
+          return response.arrayBuffer();
+        })
+        .then(function(arrayBuffer) {
+          sourceBuffer.onerror = function(e) {
+            console.log(e);
+          }
+          sourceBuffer.onupdate = function(e) {
+            console.log(e);
+            console.log(this.buffered.end(0));
+            console.log(ve.buffered.end(0));
+          }
+          sourceBuffer.onupdateend = function(e) {
+            if (sourceBuffer.updating && mediaSource.readyState == 'open') {
+              mediaSource.endOfStream();
+            }
+            console.log(this.buffered.end(0));
+          }
+          sourceBuffer.appendBuffer(arrayBuffer);
+        })
+      };
+  </script>
+
+</body>
+</html>

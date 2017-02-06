@@ -47,78 +47,60 @@
       var mediaSource = this;
       var sourceBuffer = mediaSource.addSourceBuffer(mime);
       vidData.then(function(data){
-        fetchRangeReader(data.stream, data.initRange)
-          .then(function(reader) {
-            function processResult(result) {
-              if (result.done) {
-                mediaSource.endOfStream();
-                return;
+        var rangeCount = 0;
+        (function processRange(streamName, range) {
+          
+        })
+
+
+        (function  processRange(stream, range) {
+          fetchRange(stream, range)
+            .then(function(reader) {
+
+              function processResult(result) {
+                if (result.done) {
+                  mediaSource.endOfStream();
+                  return;
+                }
+                sourceBuffer.appendBuffer(result.value);
               }
-              sourceBuffer.appendBuffer(result.value);
-            }
 
-            sourceBuffer.onupdateend = function() {
+              sourceBuffer.onupdateend = function() {
+                reader.read().then(processResult);
+              }
+
               reader.read().then(processResult);
-            }
+            })
+          // }
+        
+        // mediaSource.onsourceended = function() {
+          if (rangeCount < data.index.length) {
+            // processRange(data.stream, data.index[rangeCount].range);
+            rangeCount++;
+          }
+          // console.log("Ended");
+        // }
 
-            reader.read().then(processResult);
-          })
+        // processRange(data.stream, data.initRange);
+        })(data.stream, data.initRange);
       })
-      
-
     }
 
-    function fetchRangeReader(file, range) {
+    function fetchRange(file, range) {
       var mediaHeaders = new Headers();
+      range = "bytes=" + range;
       mediaHeaders.append('Range', range);
       var reqInit = { headers: mediaHeaders };
       return fetch(file, reqInit)
         .then(function(response) {
-          return response.body.getReader();
+          // return response.body.getReader();
+          return response;
         })
     }
 
     // function fetchSegment()
 
 
-  </script>
-
-  <script>
-    // var vidElement = document.querySelector('video');
-
-    // window.MediaSource = window.MediaSource || window.WebKitMediaSource;
-    // if (window.MediaSource) {
-    //   var mediaSource = new MediaSource();
-    //   vidElement.src = URL.createObjectURL(mediaSource);
-    //   // TODO: Make version that tries if (readyState != closed) {}
-    //   mediaSource.addEventListener('sourceopen', sourceOpen);
-    // } else {
-    //   console.log("The Media Source Extensions API is not supported.")
-    // }
-
-    function sourceOpen_(e) {
-      var mime = 'video/webm; codecs="opus, vp9"';
-      var mediaSource = this;
-      var sourceBuffer = mediaSource.addSourceBuffer(mime);
-      var video = 'droid.webm';
-      fetch(video).then(function(response) {
-        var reader = response.body.getReader();
-        function processResult(result) {
-          if (result.done) {
-            mediaSource.endOfStream();
-            return;
-          }
-          sourceBuffer.appendBuffer(result.value);
-        }
-
-        sourceBuffer.onupdateend = function() {
-          reader.read().then(processResult);
-        }
-
-        reader.read().then(processResult);
-
-      });
-    }
   </script>
 
 </body>

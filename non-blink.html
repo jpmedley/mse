@@ -17,16 +17,15 @@
 
 <body>     
   <h1>Simple MSE Streaming player</h1>
-  <video autoplay controls></video>
+  <video autoplay controls loop></video>
 
   <script>
     var vidElement = document.querySelector('video');
 
-    window.MediaSource = window.MediaSource || window.WebKitMediaSource;
+    // window.MediaSource = window.MediaSource || window.WebKitMediaSource;
     if (window.MediaSource) {
       var mediaSource = new MediaSource();
       vidElement.src = URL.createObjectURL(mediaSource);
-      // TODO: Make version that tries if (readyState != closed) {}
       mediaSource.addEventListener('sourceopen', sourceOpen);
     } else {
       console.log("The Media Source Extensions API is not supported.")
@@ -37,7 +36,6 @@
                        'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'];
       fileExtRe = /\/(\w+);/;
       for (var t in mimeTypes) {
-        // console.log(mimeTypes[t]);
         if (MediaSource.isTypeSupported(mimeTypes[t])) {
           var mimeType = mimeTypes[t];
           var vidExt = fileExtRe.exec(mimeType);
@@ -47,24 +45,19 @@
       var mediaSource = this;
       var sourceBuffer = mediaSource.addSourceBuffer(mimeType);
       var video = 'media/droid.' + vidExt[1];
-      fetch(video).then(function(response) {
-        var reader = response.body.getReader();
-        function processResult(result) {
-          if (result.done) {
-            mediaSource.endOfStream();
-            return;
+      fetch(video)
+        .then(function(response) {
+          return response.arrayBuffer();
+        })
+        .then(function(arrayBuffer) {
+          sourceBuffer.onupdateend = function(e) {
+            if (sourceBuffer.updating && mediaSource.readyState == 'open') {
+              mediaSource.endOfStream();
+            }
           }
-          sourceBuffer.appendBuffer(result.value);
-        }
-
-        sourceBuffer.onupdateend = function() {
-          reader.read().then(processResult);
-        }
-
-        reader.read().then(processResult);
-
-      });
-    }
+          sourceBuffer.appendBuffer(arrayBuffer);
+        })
+      };
   </script>
 
 </body>
