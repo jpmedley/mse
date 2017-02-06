@@ -17,19 +17,14 @@
 
 <body>     
   <h1>Simple MSE Streaming player</h1>
-  <video controls></video>
+  <video autoplay controls></video>
 
   <script>
     var vidElement = document.querySelector('video');
 
     if (window.MediaSource) {
       var mediaSource = new MediaSource();
-      vidElement.addEventListener('load', function() {
-        console.log("Video Loaded.");
-        // if (this.autoplay) {
-          this.play();
-        // }
-      });
+
       vidElement.src = URL.createObjectURL(mediaSource);
       mediaSource.addEventListener('sourceopen', sourceOpen);
     } else {
