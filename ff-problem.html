@@ -23,7 +23,6 @@
   <script>
     var vidElement = document.querySelector('video');
 
-    window.MediaSource = window.MediaSource || window.WebKitMediaSource;
     if (window.MediaSource) {
       var mediaSource = new MediaSource();
       vidElement.src = URL.createObjectURL(mediaSource);
