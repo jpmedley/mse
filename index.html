@@ -7,6 +7,8 @@
   <meta charset="utf-8" />
   <title>Media streaming example</title>
   <link href="styles.css" rel="stylesheet">
+  <!-- Do this for fetch: https://philipwalton.com/articles/loading-polyfills-only-when-needed/ -->
+  <script src="fetch.js" type="text/javascript"></script>
   <style>
     video {
       max-width: 100%;
@@ -16,45 +18,47 @@
 
 <body>     
   <h1>Simple MSE Streaming player</h1>
-  <video autoplay controls></video>
+  <video autoplay controls loop></video>
 
   <script>
     var vidElement = document.querySelector('video');
 
-    window.MediaSource = window.MediaSource || window.WebKitMediaSource;
+    // window.MediaSource = window.MediaSource || window.WebKitMediaSource;
     if (window.MediaSource) {
       var mediaSource = new MediaSource();
       vidElement.src = URL.createObjectURL(mediaSource);
-      // TODO: Make version that tries if (readyState != closed) {}
       mediaSource.addEventListener('sourceopen', sourceOpen);
     } else {
       console.log("The Media Source Extensions API is not supported.")
     }
 
     function sourceOpen(e) {
-      // var mime = 'video/webm; codecs="opus, vp9"';
-      var mime = 'video/webm';
+      var mimeTypes = ['video/webm; codecs="opus, vp9"',
+                       'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'];
+      fileExtRe = /\/(\w+);/;
+      for (var t in mimeTypes) {
+        if (MediaSource.isTypeSupported(mimeTypes[t])) {
+          var mimeType = mimeTypes[t];
+          var vidExt = fileExtRe.exec(mimeType);
+          break;
+        }
+      }
       var mediaSource = this;
-      var sourceBuffer = mediaSource.addSourceBuffer(mime);
-      var video = 'media/droid.webm';
-      fetch(video).then(function(response) {
-        var reader = response.body.getReader();
-        function processResult(result) {
-          if (result.done) {
-            mediaSource.endOfStream();
-            return;
+      var sourceBuffer = mediaSource.addSourceBuffer(mimeType);
+      var video = 'media/droid.' + vidExt[1];
+      fetch(video)
+        .then(function(response) {
+          return response.arrayBuffer();
+        })
+        .then(function(arrayBuffer) {
+          sourceBuffer.onupdateend = function(e) {
+            if (sourceBuffer.updating && mediaSource.readyState == 'open') {
+              mediaSource.endOfStream();
+            }
           }
-          sourceBuffer.appendBuffer(result.value);
-        }
-
-        sourceBuffer.onupdateend = function() {
-          reader.read().then(processResult);
-        }
-
-        reader.read().then(processResult);
-
-      });
-    }
+          sourceBuffer.appendBuffer(arrayBuffer);
+        })
+      };
   </script>
 
 </body>
