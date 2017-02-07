@@ -43,7 +43,7 @@
         })
         .then(function(arrayBuffer) {
           sourceBuffer.onupdateend = function(e) {
-            if (!sourceBuffer.updating && mediaSource.readyState == 'open') {
+            if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
               mediaSource.endOfStream();
             }
           }
