@@ -57,6 +57,22 @@
           sourceBuffer.appendBuffer(arrayBuffer);
         });
     }
+
+    function getValidMimeType() {
+      var mimeTypes = ['video/webm; codecs="opus, vp9"',
+                       'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'];
+      fileExtRe = /\/(\w+);/;
+      for (var t in mimeTypes) {
+        if (MediaSource.isTypeSupported(mimeTypes[t])) {
+          var mimeType = mimeTypes[t];
+          var extension = fileExtRe.exec(mimeType);
+          break;
+        }
+        return {
+          mimeType: mimeType,
+          extension: extension
+        };
+      }
   </script>
 
 </body>
