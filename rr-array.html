@@ -45,7 +45,7 @@
     }
 
     function sourceOpen(e) {
-      var mediaSource = this;
+      var mediaSource = e.target;
       var mimeType = getValidMimeType();
       var sourceBuffer = mediaSource.addSourceBuffer(mimeType.mimeType);
       vidData.then(function(data) {
