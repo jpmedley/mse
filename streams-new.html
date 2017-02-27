@@ -19,16 +19,10 @@
   <h1>Simple MSE Streaming player</h1>
   <video autoplay controls loop></video>
 
-  <script>
+   <script>
     const NUM_CHUNKS = 5;
-    var video = 'media/droid.webm';
+    var videoUrl = 'media/droid.webm';
     var vidElement = document.querySelector('video');
-    var vidFile = (function(file) {
-      return fetch(file)
-        .then(function(response){
-          return response;
-        })
-    })(video);
 
     if (window.MediaSource) {
       var mediaSource = new MediaSource();
@@ -39,54 +33,37 @@
     }
 
     function sourceOpen(e) {
-      var mediaSource = e.target;
       var mimeCodec = 'video/webm; codecs="opus, vp9"';
       var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
-      vidFile
+      fetch(videoUrl)
         .then(function(response) {
-          return response.blob()
+          return response.blob();
         })
-        .then(function(fileBlob) {
-          var chunkSize = Math.ceil(fileBlob.size / NUM_CHUNKS);
-          var i = 0;
+        .then(function(blob) {
+          var chunkSize = Math.ceil(blob.size / NUM_CHUNKS);
 
           (function readChunk(i) {
             var reader = new FileReader();
-
             reader.addEventListener('load', function(e) {
               if (i == NUM_CHUNKS) {
                 mediaSource.endOfStream();
                 URL.revokeObjectURL(vidElement.src);
               } else {
-                sourceBuffer.appendBuffer(new Uint8Array(e.target.result));
+                sourceBuffer.appendBuffer(e.target.result);
               }
-            })
+            });
+
+            sourceBuffer.addEventListener('updateend', function() {
+              readChunk(++i);
+            }, { once: true });
 
             var startByte = chunkSize * i;
-            var chunk = fileBlob.slice(startByte, startByte + chunkSize);
-
-            sourceBuffer.onupdateend = function() {
-              readChunk(++i);
-            }
+            var chunk = blob.slice(startByte, startByte + chunkSize);
             reader.readAsArrayBuffer(chunk);
-          })(i);
+          })(0);
         })
     }
   </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </body>
 </html>
