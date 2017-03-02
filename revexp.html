@@ -44,7 +44,7 @@
           sourceBuffer.addEventListener('updateend', function(e) {
             if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
               mediaSource.endOfStream();
-              // window.URL.revokeObjectURL(vidElement.src);
+              window.URL.revokeObjectURL(vidElement.src);
             }
           });
           sourceBuffer.appendBuffer(arrayBuffer);
