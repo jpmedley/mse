@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<!-- Media streaming example "Segment Request Array Insertion."
+  Based on ss-array.html, this is an experiment for inserting an ancillary
+  buffer into a continuous buffer streeam. 
+-->     
+<head>
+  <meta charset="utf-8" />
+  <title>Segment Request Array Insertion</title>
+  <link href="styles.css" rel="stylesheet">
+  <script src="fetch.js" type="text/javascript"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    video {
+      max-width: 100%;
+    }
+  </style>
+</head>
+
+<body>     
+  <h1>Segment Request Array Insertion</h1>
+  <video autoplay controls></video>
+
+   <script>
+    var vidElement = document.querySelector('video');
+
+    if (window.MediaSource) {
+      var mediaSource = new MediaSource();
+      vidElement.src = URL.createObjectURL(mediaSource);
+      mediaSource.addEventListener('sourceopen', sourceOpen);
+    } else {
+      console.log("The Media Source Extensions API is not supported.")
+    }
+
+    function getSources() {
+      let sources = []
+      for (let i = 1; i < 9; i++) {
+        sources.push('media/droid00' + i.toString() + '.webm');
+      }
+      // sources.splice(1, 0, 'media/pd.webm');
+      return sources;
+    }
+
+
+    function sourceOpen(e) {
+      let sources = getSources();
+      URL.revokeObjectURL(vidElement.src);
+      // var mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+      var mimeCodec = 'video/webm; codecs="opus, vp9"';
+      var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
+      sourceBuffer.mode = 'sequence';
+
+      var hasListener = false;
+      (function readChunk(chunk) {
+        if (!hasListener) {
+          sourceBuffer.addEventListener('updateend', e => {
+            if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
+              if (sources.length) {
+                readChunk(sources.shift());
+              } else {
+                mediaSource.endOfStream();
+              }
+            }
+          });
+          hasListener = true;
+        }
+
+        fetch(chunk) 
+          .then(response => {
+            return response.arrayBuffer();
+          })
+          .then(arrayBuffer => {
+            sourceBuffer.appendBuffer(arrayBuffer);
+          });
+      })(sources.shift());
+    }
+  </script>
+
+</body>
+</html>
