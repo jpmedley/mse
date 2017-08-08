@@ -33,18 +33,21 @@
     }
 
     function sourceOpen(e) {
-      var mimeType = getValidMimeType();
-      var mediaSource = this;
-      var sourceBuffer = mediaSource.addSourceBuffer(mimeType.mimeType);
-      var video = 'media/droid.' + mimeType.extension;
-      fetch(video)
+      URL.revokeObjectURL(vidElement.src);
+      var mime = getValidMimeType();
+      var mediaSource = e.target;
+      var sourceBuffer = mediaSource.addSourceBuffer(mime.mimeType);
+      var videoUrl = 'media/droid.' + mime.extension;
+      fetch(videoUrl)
         .then(function(response) {
           return response.arrayBuffer();
         })
         .then(function(arrayBuffer) {
-          sourceBuffer.onupdateend = function(e) {
-            mediaSource.endOfStream();
-          }
+          sourceBuffer.addEventListener('updateend', function(e) {
+            if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
+              mediaSource.endOfStream();
+            }
+          });
           sourceBuffer.appendBuffer(arrayBuffer);
         });
     }
