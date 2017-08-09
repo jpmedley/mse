@@ -19,7 +19,7 @@
 <body>     
   <h1>Segment Request Array</h1>
   <video autoplay controls loop></video>
-
+  <script src="helpers.js"></script>
    <script>
     const NUM_CHUNKS = 8;
     // var i = 1;
@@ -36,9 +36,8 @@
 
 
     function sourceOpen(e) {
-      // var mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
-      var mimeCodec = 'video/webm; codecs="opus, vp9"';
-      var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
+      const mimeCodec = getValidMimeType();
+      const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
       sourceBuffer.mode = 'sequence';
 
       (function readChunk(i) {
@@ -57,7 +56,7 @@
           })
         }
 
-        var videoUrl = 'media/droid00' + i.toString() + '.webm';
+        const videoUrl = 'media/droid00' + i.toString() + "." + mimeCodec.extension;
         fetch(videoUrl)
           .then(response => {
             return response.arrayBuffer();

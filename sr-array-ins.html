@@ -32,22 +32,20 @@
       console.log("The Media Source Extensions API is not supported.")
     }
 
-    function getSources() {
+    function getSources(ofType) {
       let sources = []
       for (let i = 1; i < 9; i++) {
-        sources.push('media/droid00' + i.toString() + '.webm');
+        sources.push('media/droid00' + i.toString() + '.' + ofType);
       }
-      // sources.splice(1, 0, 'media/pd.webm');
       return sources;
     }
 
 
     function sourceOpen(e) {
-      let sources = getSources();
+      const mimeCodec = getValidMimeType();
+      let sources = getSources(mimeCodec.extension);
       URL.revokeObjectURL(vidElement.src);
-      // var mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
-      var mimeCodec = 'video/webm; codecs="opus, vp9"';
-      var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
+      var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
       sourceBuffer.mode = 'sequence';
 
       var hasListener = false;
