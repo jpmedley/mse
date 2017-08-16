@@ -22,8 +22,6 @@
   <script src="helpers.js"></script>
    <script>
     const NUM_CHUNKS = 8;
-    // var i = 1;
-    // var videoUrl = 'media/droid.webm';
     var vidElement = document.querySelector('video');
 
     if (window.MediaSource) {
@@ -41,7 +39,6 @@
       sourceBuffer.mode = 'sequence';
 
       (function readChunk(i) {
-        // i++;
         if (i == 1) {
           sourceBuffer.addEventListener('updateend', e => {
             if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
@@ -65,38 +62,6 @@
             sourceBuffer.appendBuffer(arrayBuffer);
           })
       })(1);
-    }
-
-    function sourceOpen_(e) {
-      var mimeCodec = 'video/webm; codecs="opus, vp9"';
-      var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
-      fetch(videoUrl)
-        .then(function(response) {
-          return response.blob();
-        })
-        .then(function(blob) {
-          var chunkSize = Math.ceil(blob.size / NUM_CHUNKS);
-
-          (function readChunk(i) {
-            var reader = new FileReader();
-            reader.addEventListener('load', function(e) {
-              if (i == NUM_CHUNKS) {
-                mediaSource.endOfStream();
-                URL.revokeObjectURL(vidElement.src);
-              } else {
-                sourceBuffer.appendBuffer(e.target.result);
-              }
-            });
-
-            sourceBuffer.addEventListener('updateend', function() {
-              readChunk(++i);
-            }, { once: true });
-
-            var startByte = chunkSize * i;
-            var chunk = blob.slice(startByte, startByte + chunkSize);
-            reader.readAsArrayBuffer(chunk);
-          })(0);
-        })
     }
   </script>
   <!-- <script src="vidlogger.js" defer></script> -->
