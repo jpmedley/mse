@@ -21,7 +21,7 @@
   <video autoplay controls loop></video>
   <script src="helpers.js"></script>
    <script>
-    const NUM_CHUNKS = 8;
+    const NUM_CHUNKS = 6;
     var vidElement = document.querySelector('video');
 
     if (window.MediaSource) {
@@ -32,14 +32,13 @@
       console.log("The Media Source Extensions API is not supported.")
     }
 
-
     function sourceOpen(e) {
       const mimeCodec = getValidMimeType();
       const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
       sourceBuffer.mode = 'sequence';
 
       (function readChunk(i) {
-        if (i == 1) {
+        if (i == 0) {
           sourceBuffer.addEventListener('updateend', e => {
             if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
               if (i < NUM_CHUNKS) {
@@ -53,7 +52,7 @@
           })
         }
 
-        const videoUrl = 'media/droid00' + i.toString() + "." + mimeCodec.extension;
+        let videoUrl = 'media/droid-v_' + i.toString().padStart(3, '0') + "." + mimeCodec.extension;
         fetch(videoUrl)
           .then(response => {
             return response.arrayBuffer();
@@ -61,7 +60,7 @@
           .then(arrayBuffer => {
             sourceBuffer.appendBuffer(arrayBuffer);
           })
-      })(1);
+      })(0);
     }
   </script>
   <!-- <script src="vidlogger.js" defer></script> -->

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<!-- Media streaming example "Segment Request Array."
+  This is an example of streaming files stored in multiple segments on the server.
+-->     
+<head>
+  <meta charset="utf-8" />
+  <title>Segment Request Array</title>
+  <link href="styles.css" rel="stylesheet">
+  <script src="fetch.js" type="text/javascript"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    video {
+      max-width: 100%;
+    }
+  </style>
+</head>
+
+<body>     
+  <h1>Segment Request Array</h1>
+  <video autoplay controls loop></video>
+  <script src="helpers.js"></script>
+  <script>
+    const NUM_CHUNKS = 6
+    const vidElement = document.querySelector('video');
+
+    if (window.MediaSource) {
+      var mediaSource = new MediaSource();
+      vidElement.src = URL.createObjectURL(mediaSource);
+      mediaSource.addEventListener('sourceopen', sourceOpen);
+    } else {
+      console.log("The Media Source Extensions API is not supported.");
+    }
+
+    function sourceOpen(e) {
+      const mimeCodec = getValidMimeType();
+      const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
+      sourceBuffer.mode = 'segments';
+
+      (function readChunk(i) {
+        if (i == 0) {
+          sourceBuffer.addEventListener('updateend', e => {
+            if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
+              if (i < NUM_CHUNKS) {
+                i++;
+                readChunk(i);
+              } else {
+                mediaSource.endOfStream();
+                URL.revokeObjectURL(vidElement.src);
+              }
+            }
+          })
+        }
+
+        let videoURL = 'media/droid-v_' + i.toString().padStart(3, '0') + "." + mimeCodec.extension;
+        fetch(videoURL)
+        .then(response => {
+          return response.arrayBuffer();
+        })
+        .then(arrayBuffer => {
+          sourceBuffer.appendBuffer(arrayBuffer);
+        });
+      })(0);
+    }
+  </script>
+  <!-- <script src="vidlogger.js" defer></script> -->
+</body>
+</html>
