@@ -1,5 +1,5 @@
 Header -i input source -s  -b:v >0k -c:v codec -c:a codec -b:v bitrate -b:a bitrate -f segment -g int -segment_time sec -map val -map val output target
-ffmpeg -i source-orient.mp4     -c:v libx264 -an  -b:v 350k   -f segment -g 6       droid-v_%03d.mp4
-ffmpeg -i source-orient.mp4     -vn  -c:a aac   -b:a 96k -f segment   -segment_time 10     droid-a_%03d.m4a
-ffmpeg -i source-orient.mp4 -vf setsar=1:1   -c:v libvpx-vp9 -an  -b:v 350k   -f segment -g 6       droid-v_%03d.webm
-ffmpeg -i source-orient.mp4     -vn  -c:a libopus   -b:a 96k -f segment   -segment_time 10     droid-a_%03d.webm
+ffmpeg -i $2.mp4     -c:v libx264 -an  -b:v 350k   -f segment -g 60       $3-v_%03d.mp4
+ffmpeg -i $2.mp4     -vn  -c:a aac   -b:a 96k -f segment   -segment_time 2     $3-a_%03d.m4a
+ffmpeg -i $2.mp4 -vf setsar=1:1   -c:v libvpx-vp9 -an  -b:v 350k   -f segment -g 60       $3-v_%03d.webm
+ffmpeg -i $2.mp4     -vn  -c:a libopus   -b:a 96k -f segment   -segment_time 2     $3-a_%03d.webm
