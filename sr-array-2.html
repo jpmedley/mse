@@ -33,14 +33,16 @@
     }
 
     function sourceOpen(e) {
-      const mimeCodec = getValidMimeType();
+      const mimeCodec = getValidMimeType("video");
       let sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
+      sourceBuffer.addEventListener('error', err => {
+        console.log(err);
+      }, {once: true});
       sourceBuffer.mode = 'segments';
 
       (function readChunk(i) {
         if (i == 0) {
           sourceBuffer.addEventListener('updateend', e => {
-            console.log(e);
             if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
               if (i < NUM_CHUNKS) {
                 i++;
