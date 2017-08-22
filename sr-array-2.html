@@ -34,12 +34,13 @@
 
     function sourceOpen(e) {
       const mimeCodec = getValidMimeType();
-      const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
+      let sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
       sourceBuffer.mode = 'segments';
 
       (function readChunk(i) {
         if (i == 0) {
           sourceBuffer.addEventListener('updateend', e => {
+            console.log(e);
             if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
               if (i < NUM_CHUNKS) {
                 i++;
@@ -49,7 +50,7 @@
                 URL.revokeObjectURL(vidElement.src);
               }
             }
-          })
+          });
         }
 
         let videoURL = 'media/droid-v_' + i.toString().padStart(3, '0') + "." + mimeCodec.extension;
