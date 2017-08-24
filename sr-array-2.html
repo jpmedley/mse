@@ -21,7 +21,8 @@
   <video autoplay controls loop></video>
   <script src="helpers.js"></script>
   <script>
-    const NUM_CHUNKS = 6
+    const NUM_CHUNKS = 8
+    const START_CHUNK  = 0
     const vidElement = document.querySelector('video');
 
     if (window.MediaSource) {
@@ -33,15 +34,16 @@
     }
 
     function sourceOpen(e) {
-      const mimeCodec = getValidMimeType("video");
+      const mimeCodec = getValidMimeType("video","mp4");
       let sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
       sourceBuffer.addEventListener('error', err => {
+        console.log("This is the error:");
         console.log(err);
-      }, {once: true});
-      sourceBuffer.mode = 'segments';
+      });
+      // vidElement.play();
 
       (function readChunk(i) {
-        if (i == 0) {
+        if (i == START_CHUNK) {
           sourceBuffer.addEventListener('updateend', e => {
             if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
               if (i < NUM_CHUNKS) {
@@ -53,17 +55,19 @@
               }
             }
           });
+        } 
+        if (i < NUM_CHUNKS) {
+          let videoURL = 'media/test' + i.toString().padStart(3, '0') + "." + mimeCodec.extension;
+          // let videoURL = 'media/test' + i.toString() + '.mp4';
+          fetch(videoURL)
+          .then(response => {
+            return response.arrayBuffer();
+          })
+          .then(arrayBuffer => {
+            sourceBuffer.appendBuffer(arrayBuffer);
+          });
         }
-
-        let videoURL = 'media/droid-v_' + i.toString().padStart(3, '0') + "." + mimeCodec.extension;
-        fetch(videoURL)
-        .then(response => {
-          return response.arrayBuffer();
-        })
-        .then(arrayBuffer => {
-          sourceBuffer.appendBuffer(arrayBuffer);
-        });
-      })(0);
+      })(START_CHUNK);
     }
   </script>
   <!-- <script src="vidlogger.js" defer></script> -->

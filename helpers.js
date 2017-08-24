@@ -1,12 +1,12 @@
 'use strict';
 
-function getValidMimeType(mediaType) {
+function getValidMimeType(mediaType, containerType) {
   mediaType = mediaType || "muxed";
   const mimeCatalog = {
     "codecs": {
       "video": [
         "video/webm; codecs=\"vp9\"",
-        "video/mp4; codecs=\"mp4a.40.2\""
+        "video/mp4; codecs=\"avc1.64001f\""
       ],
       "muxed": [
         "video/webm; codecs=\"opus, vp9\"",
@@ -14,7 +14,20 @@ function getValidMimeType(mediaType) {
       ]
     }
   }
-  let mimeTypes = mimeCatalog.codecs[mediaType];
+
+  let mimeTypes = new Array();
+  if (containerType) {
+    let allMimeTypes = mimeCatalog.codecs[mediaType];
+    // let mimeTypes = new Array();
+    allMimeTypes.forEach( (val,index,array) => {
+      if (val.includes(containerType)) {
+        mimeTypes.push(val);
+      }
+    })
+  } else {
+    mimeTypes = mimeCatalog.codecs[mediaType];
+  }
+
 
   const fileExtRe = /\/(\w+);/;
   for (var t in mimeTypes) {
