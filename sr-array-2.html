@@ -40,10 +40,22 @@
         console.log("This is the error:");
         console.log(err);
       });
-      // vidElement.play();
+      vidElement.play();
 
+      function transportChunk(videoURL) {
+        fetch(videoURL)
+        .then(response => {
+          return response.arrayBuffer();
+        })
+        .then(arrayBuffer => {
+          sourceBuffer.appendBuffer(arrayBuffer);
+        });
+      }
+
+      let videoURL;
       (function readChunk(i) {
-        if (i == START_CHUNK) {
+        if (i ==START_CHUNK) {
+          videoURL = "media/test_init.mp4";
           sourceBuffer.addEventListener('updateend', e => {
             if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
               if (i < NUM_CHUNKS) {
@@ -54,18 +66,12 @@
                 URL.revokeObjectURL(vidElement.src);
               }
             }
-          });
-        } 
-        if (i < NUM_CHUNKS) {
-          let videoURL = 'media/test' + i.toString().padStart(3, '0') + "." + mimeCodec.extension;
-          // let videoURL = 'media/test' + i.toString() + '.mp4';
-          fetch(videoURL)
-          .then(response => {
-            return response.arrayBuffer();
           })
-          .then(arrayBuffer => {
-            sourceBuffer.appendBuffer(arrayBuffer);
-          });
+        } else {
+          videoURL = 'media/test' + i.toString() + ".m4s";
+        }
+        if (i <= NUM_CHUNKS) {
+          transportChunk(videoURL);
         }
       })(START_CHUNK);
     }
