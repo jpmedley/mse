@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Generated with https://github.com/google/shaka-packager version 81a1497893-release-->
+<MPD xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 DASH-MPD.xsd" xmlns:cenc="urn:mpeg:cenc:2013" profiles="urn:mpeg:dash:profile:isoff-live:2011" minBufferTime="PT2S" type="dynamic" publishTime="2017-08-29T20:10:54Z" availabilityStartTime="2017-08-29T20:11:01Z" minimumUpdatePeriod="PT5S" timeShiftBufferDepth="PT1800S">
+  <Period id="0" start="PT0S">
+    <AdaptationSet id="0" contentType="video" width="1080" height="608" frameRate="15360/512" segmentAlignment="true" par="16:9">
+      <Representation id="0" bandwidth="1818269" codecs="avc1.64001f" mimeType="video/mp4" sar="1:1">
+        <SegmentTemplate timescale="15360" initialization="test_init.mp4" media="test$Number$.m4s" startNumber="1">
+          <SegmentTimeline>
+            <S t="1024" d="128000"/>
+            <S t="129024" d="125952"/>
+            <S t="254976" d="128000" r="4"/>
+            <S t="894976" d="22528"/>
+          </SegmentTimeline>
+        </SegmentTemplate>
+      </Representation>
+    </AdaptationSet>
+  </Period>
+</MPD>

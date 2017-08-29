@@ -7,7 +7,7 @@ function showBuffers() {
       console.log("currentTime = " + video.currentTime + ", dropped = " 
         + video.webkitDroppedFrameCount + ", decoded = " + video.webkitDecodedFrameCount + "\n");
       let buffered = video.buffered;
-      for (let i = 0; i < buffered; i++) {
+      for (let i = 0; i < buffered.length; i++) {
         console.log("\tbuffered[" + i + "]: " + buffered.start(i) + "-" + buffered.end(i) + "\n")
       }
     }
