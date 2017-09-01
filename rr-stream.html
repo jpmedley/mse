@@ -26,12 +26,12 @@
 
     const vidData = (function() {
       return fetch('media/droid-range.json')
-        .then(function(response) {
-          return response.json()
-            .then(function(jsn) {
-              return jsn.video[0];
-            });
+      .then(response => {
+        return response.json()
+        .then(jsn => {
+          return jsn.video[0];
         });
+      });
     })();
 
     if (window.MediaSource) {
@@ -47,29 +47,23 @@
       const mimeCodec = getValidMimeType("muxed");
       const mediaSource = this;
       let sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
-      vidData.then(function(data){
+      vidData.then(data => {
         let rangeCount = 0;
-
-
         function  processRange(stream, range) {
           fetchRange(stream, range)
-            .then(function(reader) {
-
-              function processResult(result) {
-                if (result.done) {
-                  mediaSource.endOfStream();
-                  return;
-                }
-                sourceBuffer.appendBuffer(result.value);
+          .then(reader => {
+            function processResult(result) {
+              if (result.done) {
+                mediaSource.endOfStream();
+                return;
               }
-
-              sourceBuffer.onupdateend = function() {
-                reader.read().then(processResult);
-              }
-
+              sourceBuffer.appendBuffer(result.value);
+            }
+            sourceBuffer.onupdateend = function() {
               reader.read().then(processResult);
-            })
-
+            }
+            reader.read().then(processResult);
+          })
           if (rangeCount < data.index.length) {
             rangeCount++;
           }
@@ -83,9 +77,9 @@
       mediaHeaders.append('Range', range);
       const reqInit = { headers: mediaHeaders };
       return fetch(file, reqInit)
-        .then(function(response) {
-          return response.body.getReader();
-        })
+      .then(response => {
+        return response.body.getReader();
+      })
     }
   </script>
 
