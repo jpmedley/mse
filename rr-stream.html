@@ -17,13 +17,14 @@
 <body>     
   <h1>Simple MSE Streaming player</h1>
   <video autoplay controls></video>
-
+  <script src="helpers.js"></script>
+  <!-- <script src="vidlogger.js"></script> -->
   <script>
 
 
-    var vidElement = document.querySelector('video');
+    const vidElement = document.querySelector('video');
 
-    var vidData = (function() {
+    const vidData = (function() {
       return fetch('media/droid-range.json')
         .then(function(response) {
           return response.json()
@@ -34,7 +35,7 @@
     })();
 
     if (window.MediaSource) {
-      var mediaSource = new MediaSource();
+      const mediaSource = new MediaSource();
       vidElement.src = URL.createObjectURL(mediaSource);
       // TODO: Make version that tries if (readyState != closed) {}
       mediaSource.addEventListener('sourceopen', sourceOpen);
@@ -43,11 +44,11 @@
     }
 
     function sourceOpen(e) {
-      var mime = 'video/webm; codecs="opus, vp9"';
-      var mediaSource = this;
-      var sourceBuffer = mediaSource.addSourceBuffer(mime);
+      const mimeCodec = getValidMimeType("muxed");
+      const mediaSource = this;
+      let sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
       vidData.then(function(data){
-        var rangeCount = 0;
+        let rangeCount = 0;
 
 
         function  processRange(stream, range) {
@@ -68,37 +69,24 @@
 
               reader.read().then(processResult);
             })
-          // }
-        
-        // mediaSource.onsourceended = function() {
+
           if (rangeCount < data.index.length) {
-            // processRange(data.stream, data.index[rangeCount].range);
             rangeCount++;
           }
-          // console.log("Ended");
-        // }
-
-        // processRange(data.stream, data.initRange);
-        // })(data.stream, data.initRange);
       };processRange(data.stream, data.initRange);
       })
     }
 
     function fetchRange(file, range) {
-      var mediaHeaders = new Headers();
+      const mediaHeaders = new Headers();
       range = "bytes=" + range;
       mediaHeaders.append('Range', range);
-      var reqInit = { headers: mediaHeaders };
+      const reqInit = { headers: mediaHeaders };
       return fetch(file, reqInit)
         .then(function(response) {
           return response.body.getReader();
-          // return response;
         })
     }
-
-    // function fetchSegment()
-
-
   </script>
 
 </body>
