@@ -55,7 +55,7 @@
             function processResult(result) {
               if (result.done) {
                 mediaSource.endOfStream();
-                return;
+                URL.revokeObjectURL(vidElement.src);
               }
               sourceBuffer.appendBuffer(result.value);
             }
