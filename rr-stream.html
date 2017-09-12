@@ -48,6 +48,7 @@
       const mediaSource = this;
       let sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
       vidData.then(data => {
+        console.log("Downloading " + data.stream + ".");
         let rangeCount = 0;
         function  processRange(stream, range) {
           fetchRange(stream, range)

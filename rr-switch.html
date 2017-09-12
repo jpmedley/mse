@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<!-- Media streaming example
+  Reads an .mpd file created using mp4box and plays the file
+-->
+<head>
+  <meta charset="utf-8" />
+  <title>Media streaming example</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    video {
+      max-width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Simple MSE Streaming player</h1>
+  <video autoplay controls></video>
+  <script src="helpers.js"></script>
+  <!-- <script src="vidlogger.js"></script> -->
+  <script>
+
+
+    const vidElement = document.querySelector('video');
+
+    const vidData = (function() {
+      return fetch('media/droid-range.json')
+      .then(response => {
+        return response.json()
+        .then(jsn => {
+          return jsn.video[0];
+        });
+      });
+    })();
+
+    if (window.MediaSource) {
+      const mediaSource = new MediaSource();
+      vidElement.src = URL.createObjectURL(mediaSource);
+      // TODO: Make version that tries if (readyState != closed) {}
+      mediaSource.addEventListener('sourceopen', sourceOpen);
+    } else {
+      console.log("The Media Source Extensions API is not supported.")
+    }
+
+    function sourceOpen(e) {
+      const mimeCodec = getValidMimeType("muxed");
+      const mediaSource = this;
+      let sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
+      vidData.then(data => {
+        console.log("Downloading " + data.stream + ".");
+        let rangeCount = 0;
+        function  processRange(stream, range) {
+          fetchRange(stream, range)
+          .then(reader => {
+            function processResult(result) {
+              if (result.done) {
+                mediaSource.endOfStream();
+                URL.revokeObjectURL(vidElement.src);
+              } else {
+                sourceBuffer.appendBuffer(result.value);
+              }
+            }
+            sourceBuffer.onupdateend = function() {
+              reader.read().then(processResult);
+            }
+            reader.read().then(processResult);
+          })
+          if (rangeCount < data.index.length) {
+            rangeCount++;
+          }
+      };
+      processRange(data.stream, data.initRange);
+      })
+    }
+
+    function fetchRange(file, range) {
+      const mediaHeaders = new Headers();
+      range = "bytes=" + range;
+      mediaHeaders.append('Range', range);
+      const reqInit = { headers: mediaHeaders };
+      return fetch(file, reqInit)
+      .then(response => {
+        return response.body.getReader();
+      })
+    }
+  </script>
+
+</body>
+</html>

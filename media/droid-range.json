@@ -1,15 +1,25 @@
 {
   "video": [
-    { "name": "droid",
-      "stream": "/media/droid.webm",
-      "initRange": "0-403192",
+    { "name": "droid4G",
+      "stream": "/media/droid4g.webm",
+      "initRange": "0-1046566",
       "index": [
-        { "range": "403192-806384", "start": 0, "end": 10 },
-        { "range": "806385-1209577", "start": 10, "end": 20 },
-        { "range": "1209578-1612770", "start": 20, "end": 30 },
-        { "range": "1612771-2015962", "start": 30, "end": 40 }
+        { "range": "1046567-2093132", "start": 0, "end": 10 },
+        { "range": "2093133-3139698", "start": 10, "end": 20 },
+        { "range": "3139699-4186268", "start": 20, "end": 30 },
+        { "range": "4186269-5232833", "start": 30, "end": 40 }
       ]
-    }
+    },
+      { "name": "droid3G",
+        "stream": "/media/droid3g.webm",
+        "initRange": "0-403192",
+        "index": [
+          { "range": "403192-806384", "start": 0, "end": 10 },
+          { "range": "806385-1209577", "start": 10, "end": 20 },
+          { "range": "1209578-1612770", "start": 20, "end": 30 },
+          { "range": "1612771-2015962", "start": 30, "end": 40 }
+        ]
+      }
   ],
  "audio": [
     { "name" : "'English",
