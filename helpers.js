@@ -1,5 +1,35 @@
 'use strict';
 
+function fetchRange(file, range) {
+  return new Promise((resolve, reject) => {
+    const mediaHeaders = new Headers();
+    range = "bytes=" + range;
+    mediaHeaders.append('Range', range);
+    const reqInit = { headers: mediaHeaders };
+    fetch(file, reqInit)
+    .then(response => {
+      resolve(response.body.getReader())
+    })
+    .catch(e => {
+      reject(e);
+    })
+  })
+
+
+
+  // const mediaHeaders = new Headers();
+  // range = "bytes=" + range;
+  // mediaHeaders.append('Range', range);
+  // const reqInit = { headers: mediaHeaders };
+  // return fetch(file, reqInit)
+  // .then(response => {
+  //   return response.body.getReader();
+  // })
+  // .catch(e => {
+  //   console.log(e);
+  // })
+}
+
 function getValidMimeType(mediaType, containerType) {
   mediaType = mediaType || "muxed";
   const mimeCatalog = {

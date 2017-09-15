@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Media streaming example</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    video {
+      max-width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Simple MSE Streaming player</h1>
+  <video autoplay controls></video>
+  <script src="helpers.js"></script>
+  <!-- <script src="vidlogger.js"></script> -->
+  <script>
+
+
+    const vidElement = document.querySelector('video');
+
+    if (window.MediaSource) {
+      const mediaSource = new MediaSource();
+      vidElement.src = URL.createObjectURL(mediaSource);
+      // TODO: Make version that tries if (readyState != closed) {}
+      mediaSource.addEventListener('sourceopen', sourceOpen);
+    } else {
+      console.log("The Media Source Extensions API is not supported.")
+    }
+
+    function sourceOpen(e) {
+      const mimeCodec = getValidMimeType("muxed", "mp4");
+      const mediaSource = this;
+      let sourceBuffer = mediaSource.addSourceBuffer(mimeCodec.mimeType);
+      sourceBuffer.addEventListener('abort', function(e) {
+        console.log(e);
+      });
+      sourceBuffer.addEventListener('error', function(e) {
+        console.log(e);
+      })
+      sourceBuffer.addEventListener('update', function(e) {
+        console.log(e);
+      });
+      sourceBuffer.addEventListener('updateend', function(e) {
+        console.log(e);
+      });
+      sourceBuffer.addEventListener('updatestart', function(e) {
+        console.log(e);
+      })
+      const RANGE_SIZE = 1000000;
+      // const videoUrl = "https://storage.googleapis.com/dalecurtis-shared/buck2.mp4";
+      const videoUrl = 'media/buck2.mp4';
+
+      let rangeBeg = 0;
+      let rangeEnd = rangeBeg + RANGE_SIZE;
+      let range = rangeBeg.toString() + "-" + rangeEnd.toString();
+
+      (function loadRange(range){
+        fetchRange(videoUrl, range)
+        .then(reader => {
+          (function readChunk(){
+            reader.read()
+            .then(chunk => {
+              if (chunk.done) {
+                rangeBeg = rangeEnd + 1;
+                rangeEnd = rangeBeg + RANGE_SIZE;
+                range = rangeBeg.toString() + "-" + rangeEnd.toString();
+                loadRange(range);
+              } else {
+                // Start here: This is where 'updateend' needs to be worked in.
+                sourceBuffer.appendBuffer(chunk.value);
+                readChunk()
+              }
+            })
+          })();
+        });
+      })(range);
+    }
+  </script>
+
+</body>
+</html>
